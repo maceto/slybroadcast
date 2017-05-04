@@ -1,6 +1,10 @@
 require 'singleton'
 require 'uri'
 require 'net/http'
+require_relative 'exceptions'
+require_relative 'parsers/campaign_status_response'
+require_relative 'parsers/campaign_actions_response'
+require_relative 'parsers/remaining_messages_response'
 
 # usage:
 #   Slybroadcast::Client.credentials = {
@@ -21,7 +25,14 @@ module Slybroadcast
 
     API_URI = 'https://www.mobile-sphere.com/gateway'.freeze
     ENDPOINTS = {
-      verify: 'vmb.php'
+      verify: 'vmb.php',
+      campaign_call_status: 'vmb.php',
+      campaign_pause: 'vmb.php',
+      campaign_resume: 'vmb.php',
+      campaign_cancel: 'vmb.php',
+      account_message_balance: 'vmb.php',
+      download_audio_file: 'vmb.dla.php',
+      list_audio_files: 'vmb.aflist.php'
     }.freeze
 
     class << self
@@ -40,41 +51,158 @@ module Slybroadcast
         set_credentials(options.merge(c_option: :user_verify))
       )
 
-      raise ArgumentError, 'Invalid `c_uid` or `c_password`' unless res.body.eql?("OK")
+      raise Exceptions::InvalidCredentials, 'Invalid `c_uid` or `c_password`' unless res.body.eql?("OK")
 
       true
     end
 
-    def campaign_status(**options)
-      raise NotImplementedError
-    end
+    def campaign_call_status(**options)
+      params = set_credentials(options)
 
-    def call_status(**options)
-      raise NotImplementedError
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::CampaignStatusResponse.new(res.body)
+
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        when 'Bad Audio, can\'t download'
+          raise Exceptions::BadAudio, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
     def campaign_pause(**options)
-      raise NotImplementedError
+      params = set_credentials(options.merge(c_option: 'pause'))
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::CampaignActionsResponse.new(res.body)
+
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        when 'session_id: required'
+          raise Exceptions::SessionIdRequired, result.error
+        when 'already finished'
+          raise Exceptions::CampaignAlreadyFinished, result.error
+        when 'invalid or not found'
+          raise Exceptions::CampaignNotFound, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
     def campaign_resume(**options)
-      raise NotImplementedError
+      params = set_credentials(options.merge(c_option: 'run'))
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::CampaignActionsResponse.new(res.body)
+
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        when 'session_id: required'
+          raise Exceptions::SessionIdRequired, result.error
+        when 'already finished'
+          raise Exceptions::CampaignAlreadyFinished, result.error
+        when 'invalid or not found'
+          raise Exceptions::CampaignNotFound, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
     def campaign_cancel(**options)
-      raise NotImplementedError
+      params = set_credentials(options.merge(c_option: 'stop'))
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::CampaignActionsResponse.new(res.body)
+
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        when 'session_id: required'
+          raise Exceptions::SessionIdRequired, result.error
+        when 'already finished'
+          raise Exceptions::CampaignAlreadyFinished, result.error
+        when 'invalid or not found'
+          raise Exceptions::CampaignNotFound, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
-    def account_message_balance(**options)
-      raise NotImplementedError
+    def account_message_balance
+      params = set_credentials(remain_message: '1')
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::RemainingMessagesResponse.new(res.body)
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
     def download_audio_file(**options)
-      raise NotImplementedError
+      params = set_credentials(options)
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+      result = Parsers::RemainingMessagesResponse.new(res.body)
+      if result.failed?
+        case result.error
+        when 'c_uid: required'
+          raise Exceptions::InvalidCredentials, result.error
+        else
+          raise StandardError, result.error
+        end
+      end
+      result
     end
 
-    def list_audio_files(**options)
-      raise NotImplementedError
+    def list_audio_files
+      params = set_credentials(c_method: 'get_audio_list')
+
+      res = Net::HTTP.post_form(
+        endpoint_url,
+        params
+      )
+
+      puts res.body
     end
 
     private

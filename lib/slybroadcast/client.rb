@@ -45,14 +45,11 @@ module Slybroadcast
 
     def verify(**options)
       params = set_credentials(options.merge(c_option: :user_verify))
-
       res = Net::HTTP.post_form(
         endpoint_url,
         set_credentials(options.merge(c_option: :user_verify))
       )
-
       raise Exceptions::InvalidCredentials, 'Invalid `c_uid` or `c_password`' unless res.body.eql?("OK")
-
       true
     end
 
@@ -64,145 +61,66 @@ module Slybroadcast
         params
       )
       result = Parsers::CampaignStatusResponse.new(res.body)
-
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        when 'Bad Audio, can\'t download'
-          raise Exceptions::BadAudio, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def campaign_pause(**options)
       params = set_credentials(options.merge(c_option: 'pause'))
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
       result = Parsers::CampaignActionsResponse.new(res.body)
-
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        when 'session_id: required'
-          raise Exceptions::SessionIdRequired, result.error
-        when 'already finished'
-          raise Exceptions::CampaignAlreadyFinished, result.error
-        when 'invalid or not found'
-          raise Exceptions::CampaignNotFound, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def campaign_resume(**options)
       params = set_credentials(options.merge(c_option: 'run'))
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
       result = Parsers::CampaignActionsResponse.new(res.body)
-
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        when 'session_id: required'
-          raise Exceptions::SessionIdRequired, result.error
-        when 'already finished'
-          raise Exceptions::CampaignAlreadyFinished, result.error
-        when 'invalid or not found'
-          raise Exceptions::CampaignNotFound, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def campaign_cancel(**options)
       params = set_credentials(options.merge(c_option: 'stop'))
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
       result = Parsers::CampaignActionsResponse.new(res.body)
-
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        when 'session_id: required'
-          raise Exceptions::SessionIdRequired, result.error
-        when 'already finished'
-          raise Exceptions::CampaignAlreadyFinished, result.error
-        when 'invalid or not found'
-          raise Exceptions::CampaignNotFound, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def account_message_balance
       params = set_credentials(remain_message: '1')
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
       result = Parsers::RemainingMessagesResponse.new(res.body)
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def download_audio_file(**options)
       params = set_credentials(options)
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
       result = Parsers::RemainingMessagesResponse.new(res.body)
-      if result.failed?
-        case result.error
-        when 'c_uid: required'
-          raise Exceptions::InvalidCredentials, result.error
-        else
-          raise StandardError, result.error
-        end
-      end
-      result
+      result.success? ? result : handle_error(result.error)
     end
 
     def list_audio_files
       params = set_credentials(c_method: 'get_audio_list')
-
       res = Net::HTTP.post_form(
         endpoint_url,
         params
       )
-
-      puts res.body
+      res.body
     end
 
     private
@@ -215,5 +133,23 @@ module Slybroadcast
     def set_credentials(params)
       (self.class.credentials || {}).merge(params)
     end
+
+    def handle_error(err)
+      case err
+      when 'c_uid: required'
+        raise Exceptions::InvalidCredentials, err
+      when 'Bad Audio, can\'t download'
+        raise Exceptions::BadAudio, err
+      when 'session_id: required'
+        raise Exceptions::SessionIdRequired, err
+      when 'already finished'
+        raise Exceptions::CampaignAlreadyFinished, err
+      when 'invalid or not found'
+        raise Exceptions::CampaignNotFound, err
+      else
+        raise StandardError, err
+      end
+    end
+
   end
 end

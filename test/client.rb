@@ -5,16 +5,10 @@ describe Slybroadcast::Client do
 
     it 'should be true' do
 
-      class MockResponse
-        def self.body
-          'OK'
-        end
-      end
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "OK")
 
-      mock = MiniTest::Mock.new
-      mock.expect(:post_form, MockResponse, [{c_uid: 'user@example.com', c_password: 'secret' }])
-
-      Net::HTTP.stub :post_form, mock.post_form({:c_uid=>"user@example.com", :c_password=>"secret"}) do
+      Net::HTTP.stub :post_form, mocked_reponse do
         result = Slybroadcast::Client.verify({})
         assert result
       end
@@ -23,16 +17,10 @@ describe Slybroadcast::Client do
 
     it 'should be false' do
 
-      class MockResponse
-        def self.body
-          'ERROR'
-        end
-      end
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "ERROR")
 
-      mock = MiniTest::Mock.new
-      mock.expect(:post_form, MockResponse, [{c_uid: 'user@example.com', c_password: 'secret' }])
-
-      Net::HTTP.stub :post_form, mock.post_form({:c_uid=>"user@example.com", :c_password=>"secret"}) do
+      Net::HTTP.stub :post_form, mocked_reponse do
         assert_raises Slybroadcast::Exceptions::InvalidCredentials do
           result = Slybroadcast::Client.verify({})
         end

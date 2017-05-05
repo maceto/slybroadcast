@@ -5,6 +5,7 @@ require_relative 'exceptions'
 require_relative 'parsers/campaign_status_response'
 require_relative 'parsers/campaign_actions_response'
 require_relative 'parsers/remaining_messages_response'
+require_relative 'parsers/download_audio_file_response'
 
 # usage:
 #   Slybroadcast::Client.credentials = {

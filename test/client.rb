@@ -9,8 +9,7 @@ describe Slybroadcast::Client do
       mocked_reponse.expect(:body, "OK")
 
       Net::HTTP.stub :post_form, mocked_reponse do
-        result = Slybroadcast::Client.verify({})
-        assert result
+        assert Slybroadcast::Client.verify({})
       end
 
     end
@@ -22,7 +21,7 @@ describe Slybroadcast::Client do
 
       Net::HTTP.stub :post_form, mocked_reponse do
         assert_raises Slybroadcast::Exceptions::InvalidCredentials do
-          result = Slybroadcast::Client.verify({})
+          Slybroadcast::Client.verify({})
         end
       end
 

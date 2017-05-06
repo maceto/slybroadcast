@@ -91,4 +91,26 @@ describe Parsers do
 
   end
 
+  describe 'AudioFileListResponse' do
+
+    it 'should return true' do
+
+      response = "\"r15294b17042522420232165.wav\"|\"123456\"|\"2017-04-25 22:42:25\"\n\"b15294b187575.wav\"|\"recording20160425-31049-1mq2hk7\"|\"2017-05-03 20:39:11\""
+      result = Parsers::AudioFileListResponse.new(response)
+      assert result.success?
+      assert_equal 2, result.list.count
+
+    end
+
+    it 'should return error description' do
+
+      response = "ERROR\nc_uid: required"
+      result = Parsers::AudioFileListResponse.new(response)
+      assert result.failed?
+      assert_equal result.error, "c_uid: required"
+
+    end
+
+  end
+
 end

@@ -178,9 +178,50 @@ describe Slybroadcast::Client do
   end
 
   describe 'download_audio_file' do
+
+    it 'should raise StandardError' do
+
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "ERROR")
+
+      Net::HTTP.stub :post_form, mocked_reponse do
+        assert_raises StandardError do
+          Slybroadcast::Client.download_audio_file
+        end
+      end
+
+    end
+
   end
 
   describe 'list_audio_files' do
+
+    it 'should return a list' do
+
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "\"r15294b17042522420232165.wav\"|\"123456\"|\"2017-04-25 22:42:25\"\n\"b15294b187575.wav\"|\"recording20160425-31049-1mq2hk7\"|\"2017-05-03 20:39:11\"")
+
+      Net::HTTP.stub :post_form, mocked_reponse do
+        result = Slybroadcast::Client.list_audio_files
+        assert_equal result.success?, true
+        assert_equal result.list.count, 2
+      end
+
+    end
+
+    it 'should raise Exceptions::InvalidCredentials' do
+
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "ERROR\nc_uid: required")
+
+      Net::HTTP.stub :post_form, mocked_reponse do
+        assert_raises Slybroadcast::Exceptions::InvalidCredentials do
+          Slybroadcast::Client.list_audio_files
+        end
+      end
+
+    end
+
   end
 
 end

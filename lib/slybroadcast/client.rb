@@ -6,6 +6,7 @@ require_relative 'parsers/campaign_status_response'
 require_relative 'parsers/campaign_actions_response'
 require_relative 'parsers/remaining_messages_response'
 require_relative 'parsers/download_audio_file_response'
+require_relative 'parsers/audio_file_list_response'
 
 # usage:
 #   Slybroadcast::Client.credentials = {
@@ -121,7 +122,8 @@ module Slybroadcast
         endpoint_url,
         params
       )
-      res.body
+      result = Parsers::AudioFileListResponse.new(res.body)
+      result.success? ? result : handle_error(result.error)
     end
 
     private

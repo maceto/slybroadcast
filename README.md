@@ -57,6 +57,7 @@ false
 
 result.error
 "Bad Audio, can't download"
+
 ```
 
 Campaign submission using a client's audio file.
@@ -85,5 +86,125 @@ false
 
 result.error
 "Bad Audio, can't download"
+
 ```
 
+### Pause Campaign
+
+To temporarily pause a campaign or session, but not cancel it.
+
+``` ruby
+
+result = Slybroadcast::Client.campaign_pause(session_id: "6045428032")
+
+result.success?
+true
+
+result.session_id
+1234567788
+
+
+
+result.failed?
+false
+
+result.error
+"already finished"
+
+```
+
+### Resume Campaign
+
+To resume a campaign.
+
+``` ruby
+
+result = Slybroadcast::Client.campaign_resume(session_id: "6045428032")
+
+result.success?
+true
+
+result.session_id
+1234567788
+
+
+
+result.failed?
+false
+
+result.error
+"already finished"
+
+```
+
+### Cancel Campaign
+
+To cancel a campaign.
+
+``` ruby
+
+result = Slybroadcast::Client.campaign_cancel(session_id: "6045428032")
+
+result.success?
+true
+
+result.session_id
+1234567788
+
+
+
+result.failed?
+false
+
+result.error
+"already finished"
+
+```
+
+### Request Account Message Balance
+
+To request the number of remaining messages in your account.
+
+``` ruby
+
+result = Slybroadcast::Client.account_message_balance
+
+result.success?
+true
+
+result.remaining_messages
+"12345"
+
+result.pending_messages
+"123"
+
+
+
+result.failed?
+false
+
+```
+
+### Retrieve a List of all Audio Files
+
+To view a full list of your audio files.
+
+``` ruby
+
+result = Slybroadcast::Client.list_audio_files
+
+result.success?
+true
+
+result.list
+[
+  {:system_file_name=>"170425242023265.wav", :audio_file_name=>"123456", :created=>"2017-04-25 22:42:25"},
+  {:system_file_name=>"294b755.wav", :audio_file_name=>"recording20160425-31049-1mq2hk7", :created=>"2017-05-03 20:39:11"},
+  {:system_file_name=>"15213094.wav", :audio_file_name=>"Test01", :created=>"2017-05-03 20:38:16"}
+]
+
+
+result.failed?
+false
+
+```

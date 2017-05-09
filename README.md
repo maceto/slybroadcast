@@ -1,7 +1,9 @@
 slybroadcast
 =========
 
-A minimal Slybroadcast Ruby client implementation
+A minimal Slybroadcast Ruby client implementation.
+
+See slybroadcast.com for information about this product.
 
 Usage
 -----------
@@ -13,7 +15,7 @@ Slybroadcast::Client.credentials = { c_uid: 'example@email.com',  c_password: 'x
 
 ```
 
-## or
+or
 
 ``` ruby
 
@@ -40,12 +42,12 @@ false
 
 ### Send a Campaign
 
-# Posibles Params
+Posibles Params
 
 Param name   | Definition    | Example
 ------------ | ------------- | -----------
 *c_uid* | Your Email Address | value="admin@mobile-sphere.com"
-*c_password | Your Password | value="12345678"
+*c_password* | Your Password | value="12345678"
 *c_url* | URL for audio file if recorded elsewhere | value="http://www.yoursite.com/wav"
 *c_audio* | Audio file type (WAV or Mp3) | value="WAV"
 *c_record_audio* | Audio file name if recorded through the Slybroadcast Recording Center | name="MeetupRecording1"

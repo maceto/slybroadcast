@@ -13,6 +13,14 @@ Slybroadcast::Client.credentials = { c_uid: 'example@email.com',  c_password: 'x
 
 ```
 
+## or
+
+``` ruby
+
+Slybroadcast::Client.verify({ c_uid: 'user@example.com', c_password: 'secret' })
+
+```
+
 ### Verify Username and Password
 
 To verify your slybroadcast Username and Password.

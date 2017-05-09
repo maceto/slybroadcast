@@ -1,7 +1,7 @@
 slybroadcast
 =========
 
-A minimal Slybroadcast Ruby client implementation.
+A minimal Slybroadcast Ruby client implementation. Based on Slybroadcast API Version 2.1
 
 See slybroadcast.com for information about this product.
 
@@ -126,12 +126,15 @@ If *c_dispo_url* is provided, each call status is sent back using POST
 and you can use Slybroadcast::Utilities.callback_parser to parse this
 POST
 
+Posible response :
+
+session_id, phone_number, status, failure_reason, delivery_time, carrier
+
 ``` ruby
 
 Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
   puts "#{session_id}, #{phone_number}, #{status}, #{failure_reason}, #{delivery_time}, #{carrier}"
 end
-
 
 ```
 

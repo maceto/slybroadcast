@@ -10,7 +10,7 @@ Usage
 
 ``` ruby
 
-require './lib/slybroadcast'
+require 'slybroadcast'
 Slybroadcast::Client.credentials = { c_uid: 'example@email.com',  c_password: 'xxx'  }
 
 ```

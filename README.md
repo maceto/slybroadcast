@@ -130,6 +130,8 @@ Posible response :
 
 session_id, phone_number, status, failure_reason, delivery_time, carrier
 
+Example
+
 ``` ruby
 
 Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|

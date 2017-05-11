@@ -135,7 +135,14 @@ Example
 ``` ruby
 
 Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
-  puts "#{session_id}, #{phone_number}, #{status}, #{failure_reason}, #{delivery_time}, #{carrier}"
+  {
+    session_id: session_id,
+    phone_number: phone_number,
+    status: status,
+    failure_reason: failure_reason,
+    delivery_time: delivery_time,
+    carrier: carrier
+  }
 end
 
 ```

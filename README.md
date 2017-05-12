@@ -65,7 +65,7 @@ Campaign submission with audio file previously uploaded.
 
 ``` ruby
 
-result = Slybroadcast::Client.campaign_call_status(
+result = Slybroadcast::Client.campaign_call(
   c_phone: "+16173999981, +16173999982, +16173999983",
   c_record_audio: "Meetup1",
   c_callerID: "+16173999980",
@@ -93,7 +93,7 @@ Campaign submission using a client's audio file.
 
 ``` ruby
 
-result = Slybroadcast::Client.campaign_call_status(
+result = Slybroadcast::Client.campaign_call(
   c_phone: "+16173999981, +16173999982, +16173999983",
   c_url: "https://user_audio_url",
   c_callerID: "+16173999980",
@@ -134,7 +134,9 @@ Example
 
 ``` ruby
 
-Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
+example_body = "9996130985|9996449444|OK||2017-05-11 17:38:18|verizon wireless:6006 - svr/2"
+
+Slybroadcast::Utilities.callback_parser(example_body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
   {
     session_id: session_id,
     phone_number: phone_number,
@@ -144,6 +146,33 @@ Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, stat
     carrier: carrier
   }
 end
+
+```
+
+### Request Status Campaign
+
+To request the call status of one phone number, the following parameters must be included. Be sure the session_id is the one received in response to your initial campaign submission.
+
+``` ruby
+
+result = Slybroadcast::Client.campaign_status(
+  session_id: "123456",
+  c_phone: "9996449444"
+)
+
+result.success?
+true
+
+result.call
+{
+  :session_id=>"123456",
+  :phone_number=>"9996449444",
+  :status=>"OK",
+  :failure_reason=>"",
+  :delivery_time=>"2017-05-11 17:38:18",
+  :carrier=>"verizon wireless:6006 - svr/2"
+}
+
 
 ```
 

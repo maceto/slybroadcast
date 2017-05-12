@@ -2,8 +2,7 @@ module Parsers
   class CampaignStatusResponse
     attr_accessor :success
     attr_accessor :error
-    attr_accessor :session_id
-    attr_accessor :number_of_phone
+    attr_accessor :call
 
     def initialize(body)
       response_parse(body)
@@ -20,14 +19,21 @@ module Parsers
     private
 
     def response_parse(body)
-      response = body.split("\n")
-      @success = response[0].strip == 'OK'
+      @success = !body.include?('ERROR')
 
       unless success
-        @error = response[1]
+        response = body.split("\n")
+        @error = response[1].strip
       else
-        @session_id = response[1].split("=")[1]
-        @number_of_phone = response[2].split("=")[1]
+        session_id, phone_number, status, failure_reason, delivery_time, carrier = body.gsub('var=','').split('|', 6)
+        @call = {
+          session_id: session_id,
+          phone_number: phone_number,
+          status: status,
+          failure_reason: failure_reason,
+          delivery_time: delivery_time,
+          carrier: carrier
+        }
       end
     end
 

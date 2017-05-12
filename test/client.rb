@@ -29,7 +29,7 @@ describe Slybroadcast::Client do
 
   end
 
-  describe 'campaign_call_status' do
+  describe 'campaign_call' do
 
     it 'should return session ID' do
 
@@ -37,7 +37,7 @@ describe Slybroadcast::Client do
       mocked_reponse.expect(:body, "OK\nsession ID=123456\nNumber of Phone=2")
 
       Net::HTTP.stub :post_form, mocked_reponse do
-        result = Slybroadcast::Client.campaign_call_status({})
+        result = Slybroadcast::Client.campaign_call({})
         assert_equal result.session_id, "123456"
         assert_equal result.number_of_phone, "2"
       end
@@ -51,7 +51,37 @@ describe Slybroadcast::Client do
 
       Net::HTTP.stub :post_form, mocked_reponse do
         assert_raises Slybroadcast::Exceptions::InvalidCredentials do
-          Slybroadcast::Client.campaign_call_status({})
+          Slybroadcast::Client.campaign_call({})
+        end
+      end
+
+    end
+
+  end
+
+  describe 'campaign_status' do
+
+    it 'should return session ID' do
+
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "var=9996130985|9996449444|OK||2017-05-11 17:38:18|verizon wireless:6006 - svr/2")
+
+      Net::HTTP.stub :post_form, mocked_reponse do
+        result = Slybroadcast::Client.campaign_status({})
+        assert_equal result.call[:status], "OK"
+        assert_equal result.call[:session_id], "9996130985"
+      end
+
+    end
+
+    it 'should raise Exceptions::InvalidCredentials' do
+
+      mocked_reponse = MiniTest::Mock.new
+      mocked_reponse.expect(:body, "ERROR\nc_uid: required")
+
+      Net::HTTP.stub :post_form, mocked_reponse do
+        assert_raises Slybroadcast::Exceptions::InvalidCredentials do
+          Slybroadcast::Client.campaign_status({})
         end
       end
 

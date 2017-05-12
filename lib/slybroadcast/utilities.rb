@@ -4,8 +4,9 @@ module Slybroadcast
 
     #
     # Usage
+    #   example_body = "9996130985|9996449444|OK||2017-05-11 17:38:18|verizon wireless:6006 - svr/2"
     #
-    #   Slybroadcast::Utilities.callback_parser(body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
+    #   Slybroadcast::Utilities.callback_parser(example_body) do |session_id, phone_number, status, failure_reason, delivery_time, carrier|
     #       {
     #         session_id: session_id,
     #         phone_number: phone_number,
@@ -17,14 +18,8 @@ module Slybroadcast
     #   end
     #
     def callback_parser(body)
-      response = body.split("\n")
-      response.map do |line|
-        line.delete!('\\"')
-        cols = line.split("|",6)
-        cols.compact!
-        cols.insert(3,nil) if cols.size == 5
-        yield *cols
-      end
+      session_id, phone_number, status, failure_reason, delivery_time, carrier = body.split('|', 6)
+      yield session_id, phone_number, status, failure_reason, delivery_time, carrier
     end
 
   end

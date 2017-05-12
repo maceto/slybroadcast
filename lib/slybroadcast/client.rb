@@ -2,6 +2,7 @@ require 'singleton'
 require 'uri'
 require 'net/http'
 require_relative 'exceptions'
+require_relative 'parsers/campaign_call_response'
 require_relative 'parsers/campaign_status_response'
 require_relative 'parsers/campaign_actions_response'
 require_relative 'parsers/remaining_messages_response'
@@ -28,7 +29,8 @@ module Slybroadcast
     API_URI = 'https://www.mobile-sphere.com/gateway'.freeze
     ENDPOINTS = {
       verify: 'vmb.php',
-      campaign_call_status: 'vmb.php',
+      campaign_call: 'vmb.php',
+      campaign_status: 'vmb.php',
       campaign: 'vmb.php',
       account_message_balance: 'vmb.php',
       download_audio_file: 'vmb.dla.php',
@@ -50,8 +52,14 @@ module Slybroadcast
       true
     end
 
-    def campaign_call_status(**options)
+    def campaign_call(**options)
       params = set_credentials(options)
+      res = make_post(endpoint_url, params)
+      parse_response(:CampaignCallResponse, res)
+    end
+
+    def campaign_status(**options)
+      params = set_credentials(options.merge(c_option: :callstatus))
       res = make_post(endpoint_url, params)
       parse_response(:CampaignStatusResponse, res)
     end

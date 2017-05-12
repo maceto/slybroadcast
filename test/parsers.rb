@@ -24,12 +24,12 @@ describe Parsers do
 
   end
 
-  describe 'CampaignStatusResponse' do
+  describe 'CampaignCallResponse' do
 
     it 'should return session ID' do
 
       response = "OK\nSession ID=123456\nNumber of Phone=123"
-      result = Parsers::CampaignStatusResponse.new(response)
+      result = Parsers::CampaignCallResponse.new(response)
       assert result.success?
       assert_equal result.session_id, "123456"
       assert_equal result.number_of_phone, "123"
@@ -39,7 +39,7 @@ describe Parsers do
     it 'should return error description' do
 
       response = "ERROR\nc_uid: required"
-      result = Parsers::CampaignStatusResponse.new(response)
+      result = Parsers::CampaignCallResponse.new(response)
       assert result.failed?
       assert_equal result.error, "c_uid: required"
 
